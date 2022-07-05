@@ -1,4 +1,7 @@
-import os
+import os, sys
+base_path = os.path.dirname(os.path.dirname(
+                            os.path.abspath(__file__)))
+sys.path.append(base_path)
 import torch.backends.cudnn as cudnn
 import torch.utils.data
 from torchvision import transforms
@@ -9,8 +12,10 @@ from torchvision import datasets
 def test(dataset_name, epoch):
     assert dataset_name in ['MNIST', 'mnist_m']
 
-    model_root = os.path.join('..', 'models')
-    image_root = os.path.join('..', 'dataset', dataset_name)
+    # model_root = os.path.join('.', 'models/save')
+    # image_root = os.path.join('.', 'dataset', dataset_name)
+    model_root = os.path.join('/emwuser/znr/code/DANN/models/save')
+    image_root = os.path.join('/emwuser/znr/code/DANN/dataset', dataset_name)
 
     cuda = True
     cudnn.benchmark = True
@@ -42,7 +47,7 @@ def test(dataset_name, epoch):
         )
     else:
         dataset = datasets.MNIST(
-            root='../dataset',
+            root='/emwuser/znr/code/DANN/dataset',
             train=False,
             transform=img_transform_source,
         )
@@ -92,7 +97,7 @@ def test(dataset_name, epoch):
         class_label.resize_as_(t_label).copy_(t_label)
 
         class_output, _ = my_net(input_data=input_img, alpha=alpha)
-        pred = class_output.data.max(1, keepdim=True)[1]
+        pred = class_output.data.max(1, keepdim=True)[1]                # [128, 1]
         n_correct += pred.eq(class_label.data.view_as(pred)).cpu().sum()
         n_total += batch_size
 
@@ -100,4 +105,9 @@ def test(dataset_name, epoch):
 
     accu = n_correct.data.numpy() * 1.0 / n_total
 
-    print 'epoch: %d, accuracy of the %s dataset: %f' % (epoch, dataset_name, accu)
+    print ('epoch: %d, accuracy of the %s dataset: %f' % (epoch, dataset_name, accu))
+    with open('logger.txt', 'a') as f:
+        f.write('epoch: %d, accuracy of the %s dataset: %f\n' % (epoch, dataset_name, accu))
+
+if __name__ == '__main__':
+    test('mnist_m', 0)

@@ -4,7 +4,7 @@ from torch.autograd import Function
 class ReverseLayerF(Function):
 
     @staticmethod
-    def forward(ctx, x, alpha):
+    def forward(ctx, x, alpha):     # x[128, 800], alpha=0.0
         ctx.alpha = alpha
 
         return x.view_as(x)
