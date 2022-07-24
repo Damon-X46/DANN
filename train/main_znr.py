@@ -13,19 +13,19 @@ from torchvision import datasets
 from torchvision import transforms
 from models.model import CNNModel
 import numpy as np
-from test import test
+from test_znr import test
 
 
 
 
-source_dataset_name = 'MNIST'
-target_dataset_name = 'mnist_m'
+source_dataset_name = 'Source'
+target_dataset_name = 'Target'
 # source_image_root = os.path.join('.', 'dataset', source_dataset_name)
 # target_image_root = os.path.join('.', 'dataset', target_dataset_name)
 # model_root = os.path.join('.', 'models/save')
-source_image_root = os.path.join('/emwuser/znr/code/DANN/dataset', source_dataset_name)
-target_image_root = os.path.join('/emwuser/znr/code/DANN/dataset', target_dataset_name)
-model_root = os.path.join('/emwuser/znr/code/DANN/models/save')
+source_image_root = os.path.join('/emwuser/znr/code/DANN/dataset/Dataset_DANN', source_dataset_name)
+target_image_root = os.path.join('/emwuser/znr/code/DANN/dataset/Dataset_DANN', target_dataset_name)
+model_root = os.path.join('/emwuser/znr/code/DANN/dataset/Dataset_DANN/model_save')
 cuda = True
 cudnn.benchmark = True
 lr = 1e-3
@@ -51,23 +51,38 @@ img_transform_target = transforms.Compose([
     transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 ])
 
-dataset_source = datasets.MNIST(                # 源域采用MNIST数据集，从网上下载
-    root='/emwuser/znr/code/DANN/dataset',
-    train=True, 
-    transform=img_transform_source,
-    download=True
+# dataset_source = datasets.MNIST(                # 源域采用MNIST数据集，从网上下载
+#     root='/emwuser/znr/code/DANN/dataset',
+#     train=True, 
+#     transform=img_transform_source,
+#     download=True
+# )
+
+# dataloader_source = torch.utils.data.DataLoader(
+#     dataset=dataset_source,
+#     batch_size=batch_size,
+#     shuffle=True,
+#     num_workers=8)
+
+train_list = os.path.join(source_image_root, 'train.txt')
+
+dataset_source = GetLoader(                     # 目标域采用mnist_m数据集
+    data_root=os.path.join(source_image_root, 'train'),
+    data_list=train_list,
+    transform=img_transform_target
 )
 
 dataloader_source = torch.utils.data.DataLoader(
     dataset=dataset_source,
     batch_size=batch_size,
     shuffle=True,
-    num_workers=8)
+    num_workers=0)
 
-train_list = os.path.join(target_image_root, 'mnist_m_train_labels.txt')
+
+train_list = os.path.join(target_image_root, 'train.txt')
 
 dataset_target = GetLoader(                     # 目标域采用mnist_m数据集
-    data_root=os.path.join(target_image_root, 'mnist_m_train'),
+    data_root=os.path.join(target_image_root, 'train'),
     data_list=train_list,
     transform=img_transform_target
 )
@@ -76,7 +91,7 @@ dataloader_target = torch.utils.data.DataLoader(
     dataset=dataset_target,
     batch_size=batch_size,
     shuffle=True,
-    num_workers=8)
+    num_workers=0)
 
 # load model
 
