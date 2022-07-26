@@ -29,7 +29,7 @@ class CNNModel(nn.Module):
 
 
         self.class_classifier = nn.Sequential()
-        self.class_classifier.add_module('c_fc1', nn.Linear(256 * 6 * 3, 100))
+        self.class_classifier.add_module('c_fc1', nn.Linear(256 * 6 * 6, 100))
         self.class_classifier.add_module('c_bn1', nn.BatchNorm1d(100))
         self.class_classifier.add_module('c_relu1', nn.ReLU(True))
         self.class_classifier.add_module('c_drop1', nn.Dropout2d())
@@ -40,16 +40,16 @@ class CNNModel(nn.Module):
         self.class_classifier.add_module('c_softmax', nn.LogSoftmax())
 
         self.domain_classifier = nn.Sequential()
-        self.domain_classifier.add_module('d_fc1', nn.Linear(256 * 6 * 3, 100))
+        self.domain_classifier.add_module('d_fc1', nn.Linear(256 * 6 * 6, 100))
         self.domain_classifier.add_module('d_bn1', nn.BatchNorm1d(100))
         self.domain_classifier.add_module('d_relu1', nn.ReLU(True))
         self.domain_classifier.add_module('d_fc2', nn.Linear(100, 2))
         self.domain_classifier.add_module('d_softmax', nn.LogSoftmax(dim=1))
 
     def forward(self, input_data, alpha):       # input_data[128, 3, 64, 40]
-        input_data = input_data.expand(input_data.data.shape[0], 3, 64, 40)     # [128, 3, 64, 40]
+        input_data = input_data.expand(input_data.data.shape[0], 3, 64, 64)     # [128, 3, 64, 40]
         feature = self.feature(input_data)      # [128, 256, 6, 3]
-        feature = feature.view(-1, 256 * 6 * 3)  # [128, 4608]
+        feature = feature.view(-1, 256 * 6 * 6)  # [128, 4608]
         reverse_feature = ReverseLayerF.apply(feature, alpha)                   # [128, 4608]
         class_output = self.class_classifier(feature)                           # [128, 10]         # 用来分是哪个数字(0-9)
         domain_output = self.domain_classifier(reverse_feature)                 # [128, 2]          # 用来分是哪个域(源域还是目标域)
@@ -59,6 +59,6 @@ class CNNModel(nn.Module):
 
 if __name__ == '__main__':
     model = CNNModel()
-    batches = torch.normal(0, 1, (128, 3, 64, 40))
+    batches = torch.normal(0, 1, (128, 3, 64, 64))
     pre = model(batches, 0.0)
     pass

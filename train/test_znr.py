@@ -20,7 +20,7 @@ def test(dataset_name, epoch):
     cuda = True
     cudnn.benchmark = True
     batch_size = 128
-    image_size = 28
+    image_size = 64
     alpha = 0
 
     """load data"""

@@ -30,7 +30,7 @@ cuda = True
 cudnn.benchmark = True
 lr = 1e-3
 batch_size = 128
-image_size = 28
+image_size = 64
 n_epoch = 100
 
 manual_seed = random.randint(1, 10000)
