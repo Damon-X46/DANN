@@ -11,7 +11,7 @@ import torch.utils.data
 from dataset.data_loader import GetLoader
 from torchvision import datasets
 from torchvision import transforms
-from models.model import CNNModel
+from models.model_znr import CNNModel
 import numpy as np
 from test_znr import test
 
